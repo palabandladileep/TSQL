@@ -1,0 +1,63 @@
+create table sales.customer2_audit
+( 
+change_id INT IDENTITY PRIMARY KEY,
+    customer_id INT NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+	last_name VARCHAR(255) NOT NULL,
+    phone varchar(20)  NULL,
+	
+	street varchar(20)  NULL,
+	city varchar(20)  NULL,
+	state_name varchar(20)  NULL,
+	zip_code varchar(20)  NULL,
+	updated_at DATETIME NOT NULL,
+    operation CHAR(3) NOT NULL,
+   
+	)
+
+CREATE TRIGGER sales_customers_Deleteds
+ON sales.customers
+AFTER  DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO sales.customer2_audit(
+       customer_id,
+         first_name,
+         last_name,
+        phone,
+	
+        street, 
+		city,
+		zip_code,
+        updated_at, 
+        operation
+    )
+   
+    SELECT
+       d.customer_id,
+         first_name,
+         last_name,
+        phone,
+       
+        street, 
+		city,
+		
+		zip_code,
+        GETDATE(),
+        'DEL'
+    FROM
+        deleted d ;
+END
+
+
+
+delete from sales.customers
+where [customer_id]=8;
+
+
+
+SELECT 
+    * 
+FROM 
+    sales.customer2_audit;
